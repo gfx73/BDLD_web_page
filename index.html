@@ -16,13 +16,13 @@ Smart contract calculator
 <br>
 <form>
     <label for="num1">Number 1:</label><br>
-    <input type="number" id="num1" name="num1"><br>
+    <input type="number" id="num1" name="num1" value="1"><br>
 
     <label for="num2">Number 2:</label><br>
-    <input type="number" id="num2" name="num2"><br>
+    <input type="number" id="num2" name="num2" value="1"><br>
 
     <p>Choose operation_type:</p>
-    <input type="radio" id="plus" name="operation_type" value="plus">
+    <input type="radio" id="plus" name="operation_type" value="plus" checked>
     <label for="plus">+</label><br>
     <input type="radio" id="sub" name="operation_type" value="sub">
     <label for="sub">-</label><br>
@@ -49,7 +49,7 @@ Status: <span id="status">Loading...</span>
     }
 
     async function loadContract() {
-        return await new window.web3.eth.Contract([
+        return new window.web3.eth.Contract([
             {
                 "inputs": [
                     {
@@ -184,24 +184,27 @@ Status: <span id="status">Loading...</span>
 
         console.log(operations);
         console.log(operation_type);
+        console.log(window.contract);
+        console.log(window.contract.methods);
 
         switch (operation_type) {
             case "plus":
-                console.log('beg')
-                result = await window.contract.methods.plus(num1, num2).send({ from: account });
+                console.log('beg');
+                result = await window.contract.methods.plus(1, 1).call();
+
                 console.log('end');
                 console.log(result);
                 break;
             case "sub":
-                result = await window.contract.methods.sub(num1, num2).send({ from: account });
+                result = await window.contract.methods.sub(num1, num2).call()
                 break;
             case "mul":
-                result = await window.contract.methods.mul(num1, num2).send({ from: account });
+                result = await window.contract.methods.mul(num1, num2).call()
                 break;
             case "div":
-                result = await window.contract.methods.div(num1, num2).send({ from: account });
+                result = await window.contract.methods.div(num1, num2).call()
         }
-        console.log('result is:')
+        console.log('result is:');
         console.log(result);
         updateStatus(`result: ${result}`);
     }
