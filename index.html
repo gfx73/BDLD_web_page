@@ -146,12 +146,13 @@ Status: <span id="status">Loading...</span>
                 "stateMutability": "pure",
                 "type": "function"
             }
-        ], '0x2c9cfc8cbbf7a3de3c3d890197237559971bc54c');
+        ], '0x42dbde2c7023c0bb36ef387a00710948be5ff17f');
     }
 
     async function getCurrentAccount() {
         const accounts = await window.web3.eth.getAccounts();
-        return accounts[0];r
+        console.log(accounts[0]);
+        return accounts[0];
     }
 
     async function load() {
@@ -168,6 +169,7 @@ Status: <span id="status">Loading...</span>
 
     async function calc() {
         updateStatus('fetching the result...');
+        const account = await getCurrentAccount();
         const operations = document.getElementsByName("operation_type");
         let operation_type;
 
@@ -186,18 +188,18 @@ Status: <span id="status">Loading...</span>
         switch (operation_type) {
             case "plus":
                 console.log('beg')
-                result = await window.contract.methods.plus(num1, num2).call();
+                result = await window.contract.methods.plus(num1, num2).send({ from: account });
                 console.log('end');
                 console.log(result);
                 break;
             case "sub":
-                result = await window.contract.methods.sub(num1, num2).call();
+                result = await window.contract.methods.sub(num1, num2).send({ from: account });
                 break;
             case "mul":
-                result = await window.contract.methods.mul(num1, num2).call();
+                result = await window.contract.methods.mul(num1, num2).send({ from: account });
                 break;
             case "div":
-                result = await window.contract.methods.div(num1, num2).call();
+                result = await window.contract.methods.div(num1, num2).send({ from: account });
         }
         console.log('result is:')
         console.log(result);
