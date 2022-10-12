@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Web 3 Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <script src='https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js'></script>
+</head>
+
+<body>
+
+Smart contract calculator
+<br>
+<form>
+    <label for="num1">Number 1:</label><br>
+    <input type="number" id="num1" name="num1"><br>
+
+    <label for="num2">Number 2:</label><br>
+    <input type="number" id="num2" name="num2"><br>
+
+    <p>Choose operation_type:</p>
+    <input type="radio" id="plus" name="operation_type" value="plus">
+    <label for="plus">+</label><br>
+    <input type="radio" id="sub" name="operation_type" value="sub">
+    <label for="sub">-</label><br>
+    <input type="radio" id="mul" name="operation_type" value="mul">
+    <label for="mul">*</label><br>
+    <input type="radio" id="div" name="operation_type" value="div">
+    <label for="div">/</label><br><br>
+
+    <input onclick="calc();" type="submit" value="Calculate!">
+</form>
+
+Status: <span id="status">Loading...</span>
+
+<script type="text/javascript">
+    async function loadWeb3() {
+        if (window.ethereum) {
+            window.web3 = new Web3(window.ethereum);
+            window.ethereum.enable();
+        }
+        else {
+            console.log(window.ethereum);
+            console.log("no ether");
+        }
+    }
+
+    async function loadContract() {
+        return await new window.web3.eth.Contract([
+            {
+                "inputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "num1",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "num2",
+                        "type": "int256"
+                    }
+                ],
+                "name": "div",
+                "outputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "",
+                        "type": "int256"
+                    }
+                ],
+                "stateMutability": "pure",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "num1",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "num2",
+                        "type": "int256"
+                    }
+                ],
+                "name": "mul",
+                "outputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "",
+                        "type": "int256"
+                    }
+                ],
+                "stateMutability": "pure",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "num1",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "num2",
+                        "type": "int256"
+                    }
+                ],
+                "name": "plus",
+                "outputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "",
+                        "type": "int256"
+                    }
+                ],
+                "stateMutability": "pure",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "num1",
+                        "type": "int256"
+                    },
+                    {
+                        "internalType": "int256",
+                        "name": "num2",
+                        "type": "int256"
+                    }
+                ],
+                "name": "sub",
+                "outputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "",
+                        "type": "int256"
+                    }
+                ],
+                "stateMutability": "pure",
+                "type": "function"
+            }
+        ], '0x2c9cfc8cbbf7a3de3c3d890197237559971bc54c');
+    }
+
+    async function getCurrentAccount() {
+        const accounts = await window.web3.eth.getAccounts();
+        return accounts[0];r
+    }
+
+    async function load() {
+        await loadWeb3();
+        window.contract = await loadContract();
+        updateStatus('Ready!');
+    }
+
+    function updateStatus(status) {
+        const statusEl = document.getElementById('status');
+        statusEl.innerHTML = status;
+        console.log(status);
+    }
+
+    async function calc() {
+        updateStatus('fetching the result...');
+        const operation_type = document.getElementById("operation_type");
+        const num1 = document.getElementById("num1");
+        const num2 = document.getElementById("num2");
+        let result;
+        switch (operation_type) {
+            case "plus":
+                result = await window.contract.methods.plus(num1, num2).call();
+                break;
+            case "sub":
+                result = await window.contract.methods.sub(num1, num2).call();
+                break;
+            case "mul":
+                result = await window.contract.methods.mul(num1, num2).call();
+                break;
+            case "div":
+                result = await window.contract.methods.div(num1, num2).call();
+                break;
+        }
+        console.log(result)
+        updateStatus(`result: ${result}`);
+    }
+
+    async function printCoolNumber() {
+        updateStatus('fetching Cool Number...');
+        const coolNumber = await window.contract.methods.coolNumber().call();
+        updateStatus(`coolNumber: ${coolNumber}`);
+    }
+
+    async function changeCoolNumber() {
+        const value = Math.floor(Math.random() * 100);
+        updateStatus(`Updating coolNumber with ${value}`);
+        const account = await getCurrentAccount();
+        const coolNumber = await window.contract.methods.setCoolNumber(value).send({ from: account });
+        updateStatus('Updated.');
+    }
+
+    load();
+</script>
+</body>
+
+</html>
