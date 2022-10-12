@@ -4,7 +4,7 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Web 3 Demo</title>
+    <title>Smart contract calculator</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
 
     <script src='https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js'></script>
@@ -14,7 +14,7 @@
 
 Smart contract calculator
 <br>
-<form>
+<form onsubmit="calc();return false">
     <label for="num1">Number 1:</label><br>
     <input type="number" id="num1" name="num1" value="1"><br>
 
@@ -31,7 +31,7 @@ Smart contract calculator
     <input type="radio" id="div" name="operation_type" value="div">
     <label for="div">/</label><br><br>
 
-    <input onclick="calc();" type="submit" value="Calculate!">
+    <input type="submit" value="Calculate!">
 </form>
 
 Status: <span id="status">Loading...</span>
@@ -149,12 +149,6 @@ Status: <span id="status">Loading...</span>
         ], '0x42dbde2c7023c0bb36ef387a00710948be5ff17f');
     }
 
-    async function getCurrentAccount() {
-        const accounts = await window.web3.eth.getAccounts();
-        console.log(accounts[0]);
-        return accounts[0];
-    }
-
     async function load() {
         await loadWeb3();
         window.contract = await loadContract();
@@ -169,7 +163,6 @@ Status: <span id="status">Loading...</span>
 
     async function calc() {
         updateStatus('fetching the result...');
-        const account = await getCurrentAccount();
         const operations = document.getElementsByName("operation_type");
         let operation_type;
 
@@ -182,45 +175,20 @@ Status: <span id="status">Loading...</span>
         const num2 = parseInt(document.getElementById("num2").value);
         let result;
 
-        console.log(operations);
-        console.log(operation_type);
-        console.log(window.contract);
-        console.log(window.contract.methods);
-
         switch (operation_type) {
             case "plus":
-                console.log('beg');
-                result = await window.contract.methods.plus(1, 1).call();
-
-                console.log('end');
-                console.log(result);
+                result = await window.contract.methods.plus(num1, num2).call();
                 break;
             case "sub":
-                result = await window.contract.methods.sub(num1, num2).call()
+                result = await window.contract.methods.sub(num1, num2).call();
                 break;
             case "mul":
-                result = await window.contract.methods.mul(num1, num2).call()
+                result = await window.contract.methods.mul(num1, num2).call();
                 break;
             case "div":
-                result = await window.contract.methods.div(num1, num2).call()
+                result = await window.contract.methods.div(num1, num2).call();
         }
-        console.log('result is:');
-        console.log(result);
         updateStatus(`result: ${result}`);
-    }
-
-    async function printCoolNumber() {
-        updateStatus('fetching Cool Number...');
-        const coolNumber = await window.contract.methods.coolNumber().call();
-        updateStatus(`coolNumber: ${coolNumber}`);
-    }
-
-    async function changeCoolNumber() {
-        const value = Math.floor(Math.random() * 100);
-        updateStatus(`Updating coolNumber with ${value}`);
-        const account = await getCurrentAccount();
-        const coolNumber = await window.contract.methods.setCoolNumber(value).send({ from: account });
-        updateStatus('Updated.');
     }
 
     load();
